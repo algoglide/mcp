@@ -76,35 +76,23 @@ export const strategyTools = [
   },
   {
     name: "deploy_agent_project",
-    description: "Deploy a new agent from inline code. Provide the three project files: agent_code (agent.py), config_yaml (config.yaml), and optionally algoglide_yaml (algoglide.yaml). Creates a deployment and seeds its project files. Returns the new deployment object including its ID.",
-    schema: {
+    description: "Deploy a new agent from inline code. Provide agent_code (agent.py content) and config_yaml (config.yaml content). Name is read from config_yaml or auto-generated. Returns the new deployment object.",
+    inputSchema: {
       type: "object",
       properties: {
-        user_id: { type: "string", description: "The user's AlgoGlide user ID" },
-        name: { type: "string", description: "Human-readable name for this deployment" },
-        agent_code: { type: "string", description: "Python agent code (agent.py) using the AlgoGlide SDK" },
-        config_yaml: { type: "string", description: "YAML config defining markets and risk params (config.yaml)" },
-        algoglide_yaml: { type: "string", description: "Optional algoglide.yaml build+deploy spec" },
-        template_id: { type: "string", description: "Optional base template (e.g. 'blank', 'fed-watch')", default: "blank" },
+        name: { type: "string", description: "Optional deployment name (overrides config.yaml name)" },
+        agent_code: { type: "string", description: "Python agent.py source code" },
+        config_yaml: { type: "string", description: "config.yaml content with markets + risk params" },
       },
-      required: ["user_id", "name", "agent_code", "config_yaml"],
+      required: ["agent_code", "config_yaml"],
     },
-    handler: async ({ user_id, name, agent_code, config_yaml, algoglide_yaml, template_id = "blank" }) => {
-      const DEFAULT_ALGOGLIDE_YAML = `version: "1"\nbuild:\n  runtime: python3.11\nbacktest:\n  period: 90d\ndeploy:\n  mode: paper\n`;
-      const dep = await api.post("/v1/deployments", { user_id }, { name, template_id });
-      try {
-        await api.post(`/v1/deployments/${dep.id}/project`, { user_id }, {
-          files: {
-            "agent.py": agent_code,
-            "config.yaml": config_yaml,
-            "algoglide.yaml": algoglide_yaml ?? DEFAULT_ALGOGLIDE_YAML,
-          },
-        });
-      } catch (seedErr) {
-        try { await api.del(`/v1/deployments/${dep.id}`, { user_id }); } catch (_) {}
-        throw new Error(`Project seeding failed for deployment ${dep.id}: ${seedErr.message}`);
-      }
-      return dep;
+    handler: async ({ name, agent_code, config_yaml }) => {
+      const FormData = (await import("form-data")).default;
+      const form = new FormData();
+      form.append("strategy_file", Buffer.from(agent_code), { filename: "agent.py", contentType: "text/plain" });
+      form.append("config_yaml", config_yaml);
+      if (name) form.append("name", name);
+      return api.postForm("/v1/deployments/deploy", form);
     },
   },
   {
