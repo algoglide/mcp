@@ -1,0 +1,10 @@
+import { api } from "../api-client.js";
+
+export const orderTools = [
+  { name: "list_orders", description: "List all orders for a user.", schema: { type: "object", properties: { user_id: { type: "string" }, limit: { type: "number", default: 100 } }, required: ["user_id"] }, handler: ({ user_id, limit = 100 }) => api.get("/v1/orders", { user_id, limit }) },
+  { name: "get_order", description: "Get a specific order by ID.", schema: { type: "object", properties: { user_id: { type: "string" }, order_id: { type: "number" } }, required: ["user_id", "order_id"] }, handler: async ({ user_id, order_id }) => { const orders = await api.get("/v1/orders", { user_id }); return orders.find((o) => o.id === order_id) ?? null; } },
+  { name: "get_order_history", description: "Get order history with filters.", schema: { type: "object", properties: { user_id: { type: "string" }, limit: { type: "number", default: 100 } }, required: ["user_id"] }, handler: ({ user_id, limit = 100 }) => api.get("/v1/orders", { user_id, limit }) },
+  { name: "list_open_orders", description: "List orders that are in created/submitted/accepted state.", schema: { type: "object", properties: { user_id: { type: "string" } }, required: ["user_id"] }, handler: async ({ user_id }) => { const orders = await api.get("/v1/orders", { user_id, limit: 500 }); return orders.filter((o) => ["created", "submitted", "accepted"].includes(o.status)); } },
+  { name: "get_order_fills", description: "Get fill events for a specific order.", schema: { type: "object", properties: { user_id: { type: "string" }, order_id: { type: "number" } }, required: ["user_id", "order_id"] }, handler: async ({ user_id, order_id }) => { const fills = await api.get("/v1/fills", { user_id, limit: 1000 }); return fills.filter((f) => f.order_id === order_id); } },
+  { name: "get_order_state_transitions", description: "Get the state machine history for an order.", schema: { type: "object", properties: { user_id: { type: "string" }, order_id: { type: "number" } }, required: ["user_id", "order_id"] }, handler: ({ user_id, order_id }) => api.get(`/v1/orders/${order_id}/transitions`, { user_id }) },
+];

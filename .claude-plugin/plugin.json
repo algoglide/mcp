@@ -1,0 +1,11 @@
+{
+  "name": "algoglide",
+  "description": "Deploy and manage AlgoGlide prediction-market strategies directly from Claude Code",
+  "version": "0.1.0",
+  "author": {
+    "name": "algoglide",
+    "url": "https://algoglide.com"
+  },
+  "homepage": "https://algoglide.com",
+  "repository": "https://github.com/algoglide/mcp"
+}

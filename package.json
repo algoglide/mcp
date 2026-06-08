@@ -1,0 +1,16 @@
+{
+  "name": "@algoglide/mcp-server",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "AlgoGlide MCP server for Claude Code",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "test": "node --test server/**/*.test.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.10",
+    "axios": "^1.7",
+    "form-data": "^4.0"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "name": "algoglide",
+  "description": "AlgoGlide MCP tools for building and deploying prediction-market trading strategies in Claude Code.",
+  "owner": {
+    "name": "AlgoGlide",
+    "email": "hello@algoglide.com"
+  },
+  "plugins": [
+    {
+      "name": "algoglide",
+      "displayName": "AlgoGlide",
+      "description": "Deploy and manage prediction-market trading agents directly from Claude Code. Includes tools for strategy development, backtesting, analytics, and live deployment.",
+      "version": "0.1.0",
+      "source": {
+        "source": "github",
+        "repo": "algoglide/mcp"
+      },
+      "author": {
+        "name": "AlgoGlide"
+      },
+      "homepage": "https://algoglide.com",
+      "repository": "https://github.com/algoglide/mcp",
+      "category": "finance",
+      "keywords": ["trading", "prediction-markets", "polymarket", "backtesting", "strategies"],
+      "mcpServers": {
+        "algoglide": {
+          "command": "node",
+          "args": ["${CLAUDE_PLUGIN_ROOT}/server/index.js"],
+          "env": {
+            "ALGOGLIDE_BASE_URL": "https://api.algoglide.com"
+          }
+        }
+      }
+    }
+  ]
+}
